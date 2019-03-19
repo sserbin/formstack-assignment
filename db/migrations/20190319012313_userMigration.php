@@ -30,13 +30,15 @@ class UserMigration extends AbstractMigration
      */
     public function change(): void
     {
-        $users = $this->table('User', ['id' => false]);
+        $users = $this->table('User', ['id' => false, 'primary_key' => 'id']);
         $users
             ->addColumn('id', 'binary', ['length' => 16])
             ->addColumn('firstName', 'string', ['length' => 255])
             ->addColumn('lastName', 'string', ['length' => 255])
             ->addColumn('email', 'string', ['length' => 255])
-            ->addColumn('password', 'string', ['length' => 255]);
+            ->addColumn('password', 'string', ['length' => 255])
+            ->addIndex(['email'], ['unique' => true]);
+
         $users->save();
     }
 }

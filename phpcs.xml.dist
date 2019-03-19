@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="forecaster">
+<ruleset name="app">
     <file>./src</file>
     <file>./tests</file>
     <arg name="colors" />

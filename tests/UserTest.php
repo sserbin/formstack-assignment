@@ -8,18 +8,14 @@ use Ramsey\Uuid\UuidInterface;
 
 class UserTest extends TestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function invalidEmailRejected(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $user = new User('john', 'doe', '123', 'pass');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function personDataIsStored(): void
     {
         $user = new User('john', 'doe', 'john@doe.org', 'pass');
@@ -29,9 +25,7 @@ class UserTest extends TestCase
         $this->assertEquals('john@doe.org', $user->getEmail());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function uuidIsAssigned(): void
     {
         $user = new User('john', 'doe', 'john@doe.org', 'pass');
@@ -39,9 +33,7 @@ class UserTest extends TestCase
         $this->assertInstanceOf(UuidInterface::class, $user->getId());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function canUpdatePersonData(): void
     {
         $user = new User('john', 'doe', 'john@doe.org', 'pass');
@@ -50,5 +42,21 @@ class UserTest extends TestCase
         $this->assertEquals('jane', $user->getFirstName());
         $this->assertEquals('roe', $user->getLastName());
         $this->assertEquals('jane@roe.org', $user->getEmail());
+    }
+
+    /** @test */
+    public function freshUserDontHaveAvatar(): void
+    {
+        $user = new User('john', 'doe', 'john@doe.org', 'pass');
+        $this->assertNull($user->getAvatar());
+    }
+
+    /** @test */
+    public function canChangeAvatar(): void
+    {
+        $user = new User('john', 'doe', 'john@doe.org', 'pass');
+        $avatar = 'new.png';
+        $user->changeAvatar($avatar);
+        $this->assertEquals($avatar, $user->getAvatar());
     }
 }

@@ -24,6 +24,9 @@ class User
     /** @var string */
     private $password;
 
+    /** @var ?string */
+    private $avatar;
+
     public function __construct(string $first, string $last, string $email, string $password)
     {
         $this->id = Uuid::uuid1();
@@ -39,6 +42,8 @@ class User
             throw new RuntimeException('failed to hash password');
         }
         $this->password = $hashed;
+
+        $this->avatar = null;
     }
 
     public function getId(): UuidInterface
@@ -79,6 +84,16 @@ class User
             throw new RuntimeException('failed to hash password');
         }
         $this->password = $hashed;
+    }
+
+    public function changeAvatar(string $filename): void
+    {
+        $this->avatar = $filename;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
     }
 
     private function validateEmail(string $email): void

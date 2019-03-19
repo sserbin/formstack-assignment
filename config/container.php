@@ -51,9 +51,10 @@ $container->add('db.name', getenv('DB_NAME'));
 
 $container->add(UserMapperInterface::class, UserMapper::class)->addArgument(PDO::class);
 $container->add(UserMapper::class)->addArgument(PDO::class);
-$container->add(UserTransformer::class, UserTransformer::class);
+$container->add(UserTransformer::class)->addArgument((string)getenv('BASE_URL') . '/avatar');
 $container->add(UserController::class)
     ->addArgument(UserMapper::class)
-    ->addArgument(UserTransformer::class);
+    ->addArgument(UserTransformer::class)
+    ->addArgument(getenv('AVATAR_STORAGE_DIR'));
 
 return $container;

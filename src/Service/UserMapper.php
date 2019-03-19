@@ -52,13 +52,15 @@ class UserMapper implements UserMapperInterface
                 firstName = :firstName,
                 lastName = :lastName,
                 email = :email,
-                password = :pass
+                password = :pass,
+                avatar = :avatar
              WHERE id = :id'
         );
         $stmt->bindValue('firstName', $user->getFirstName());
         $stmt->bindValue('lastName', $user->getLastName());
         $stmt->bindValue('email', $user->getEmail());
         $stmt->bindValue('pass', $user->getPassword());
+        $stmt->bindValue('avatar', $user->getAvatar());
         $stmt->bindValue('id', $user->getId()->getBytes());
         $stmt->execute();
     }
@@ -74,13 +76,13 @@ class UserMapper implements UserMapperInterface
 
     public function find(string $id): ?User
     {
-        $q = 'SELECT id, firstName, lastName, email, password FROM User WHERE id = :id';
+        $q = 'SELECT id, firstName, lastName, email, password, avatar FROM User WHERE id = :id';
 
         $stmt = $this->conn->prepare($q);
         $stmt->bindValue('id', Uuid::fromString($id)->getBytes());
         $stmt->execute();
 
-        /** @var array{id:string,firstName:string,lastName:string,email:string,password:string} */
+        /** @var array{id:string,firstName:string,lastName:string,email:string,password:string,avatar:?string} */
         $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return empty($record) ? null : $this->hydrate($record);
@@ -91,12 +93,12 @@ class UserMapper implements UserMapperInterface
      */
     public function getAll(): array
     {
-        $q = 'SELECT id, firstName, lastName, email, password FROM User';
+        $q = 'SELECT id, firstName, lastName, email, password, avatar FROM User';
 
         $stmt = $this->conn->prepare($q);
         $stmt->execute();
 
-        /** @var array<array{id:string,firstName:string,lastName:string,email:string,password:string}> */
+        /** @var array<array{id:string,firstName:string,lastName:string,email:string,password:string,avatar:?string}> */
         $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return array_map([$this, 'hydrate'], $records);
@@ -118,6 +120,7 @@ class UserMapper implements UserMapperInterface
         $this->setPropValue($refl, $user, 'email', $record['email']);
 
         $this->setPropValue($refl, $user, 'password', $record['password']);
+        $this->setPropValue($refl, $user, 'avatar', $record['avatar']);
 
         return $user;
     }

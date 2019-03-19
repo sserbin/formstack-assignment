@@ -105,7 +105,7 @@ class UserMapper implements UserMapperInterface
     }
 
     /**
-     * @param array{id:string,firstName:string,lastName:string,email:string,password:string} $record
+     * @param array{id:string,firstName:string,lastName:string,email:string,password:string,avatar:?string} $record
      */
     private function hydrate(array $record): User
     {

@@ -2,7 +2,8 @@
 * `vagrant up`
 * `echo 192.168.59.76   testbox.dev www.testbox.dev | sudo tee -a /etc/hosts`
 * `vagrant ssh`
-* `sudo sed -i 's/root \/vagrant;/root \/vagrant\/public;/' /etc/nginx/sites-available/default`
+* `sudo sed -i 's/root \/vagrant\/;/root \/vagrant\/public;/' /etc/nginx/sites-available/default`
+* `sudo service nginx restart`
 * `cd /vagrant`
 * `composer install`
 * `vendor/bin/phinx migrate`

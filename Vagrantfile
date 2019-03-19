@@ -35,7 +35,7 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
         apt-get install -y -qq ansible git
         ssh -T git@github.com -o StrictHostKeyChecking=no
         PYTHONUNBUFFERED=1 ansible-pull \
-            --url=git@github.com:formstack/server-playbooks-devtest.git \
+            --url=git@github.com:sserbin/server-playbooks-devtest.git -C use-non-obsolete-php \
             --inventory-file inventories/localhost \
             dev-standalone.yml
     SHELL

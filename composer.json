@@ -16,7 +16,8 @@
         "php": "^7.2",
         "ramsey/uuid": "^3.8",
         "phpunit/phpunit": "^8.0",
-        "robmorgan/phinx": "^0.10.6"
+        "robmorgan/phinx": "^0.10.6",
+        "league/container": "^3.2"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.3",

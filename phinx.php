@@ -1,18 +1,8 @@
 <?php
+use Psr\Container\ContainerInterface;
 
-use Symfony\Component\Dotenv\Dotenv;
-
-require 'vendor/autoload.php';
-
-(new Dotenv)->load('.env');
-
-$db = getenv('DB_NAME');
-$host = getenv('DB_HOST');
-$user = getenv('DB_USER');
-$pass = getenv('DB_PASS');
-
-// todo: move setup to container
-$pdo = new PDO(sprintf("mysql:dbname=%s;host=%s", $db, $host), $user, $pass);
+/** @var ContainerInterface */
+$container = require 'config/container.php';
 
 return
 [
@@ -24,8 +14,8 @@ return
         'default_migration_table' => 'phinxlog',
         'default_database' => 'development',
         'development' => [
-            'name' => $db,
-            'connection' => $pdo,
+            'name' => $container->get('db.name'),
+            'connection' => $container->get(PDO::class),
         ],
     ],
     'version_order' => 'creation'

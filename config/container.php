@@ -1,4 +1,5 @@
 <?php
+use App\Controller\Transformer\UserTransformer;
 use App\Service\UserMapper;
 use App\Service\UserMapperInterface;
 use App\Controller\UserController;
@@ -9,7 +10,7 @@ use League\Container\Container;
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 try {
-    (new Dotenv)->load('.env');
+    (new Dotenv)->load(dirname(__DIR__) . '/.env');
 } catch (Error $e) {
     // ignore if file not exists or DotEnv is not enabled (i.e. production env)
 }
@@ -50,6 +51,9 @@ $container->add('db.name', getenv('DB_NAME'));
 
 $container->add(UserMapperInterface::class, UserMapper::class)->addArgument(PDO::class);
 $container->add(UserMapper::class)->addArgument(PDO::class);
-$container->add(UserController::class)->addArgument(UserMapper::class);
+$container->add(UserTransformer::class, UserTransformer::class);
+$container->add(UserController::class)
+    ->addArgument(UserMapper::class)
+    ->addArgument(UserTransformer::class);
 
 return $container;

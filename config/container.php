@@ -1,4 +1,8 @@
 <?php
+use App\Service\UserMapper;
+use App\Service\UserMapperInterface;
+use App\Controller\UserController;
+use League\Container\ReflectionContainer;
 use Symfony\Component\Dotenv\Dotenv;
 use League\Container\Container;
 
@@ -31,12 +35,21 @@ $container->add(PDO::class, function (): PDO {
     }
 
     try {
-        return new PDO(sprintf("mysql:dbname=%s;host=%s", $db, $host), $user, $pass);
+        return new PDO(
+            sprintf("mysql:dbname=%s;host=%s", $db, $host),
+            $user,
+            $pass,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
     } catch (PDOException $e) {
         throw new RuntimeException('failed to set a pdo connection', 0, $e);
     }
-});
+}, $shared = true);
 
 $container->add('db.name', getenv('DB_NAME'));
+
+$container->add(UserMapperInterface::class, UserMapper::class)->addArgument(PDO::class);
+$container->add(UserMapper::class)->addArgument(PDO::class);
+$container->add(UserController::class)->addArgument(UserMapper::class);
 
 return $container;

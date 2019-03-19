@@ -133,11 +133,11 @@ class UserController
         $errors = [];
 
         foreach (['firstName', 'lastName', 'email', 'password'] as $field) {
-            if (empty($body[$field])) {
-                $errors[] = ["$field required"];
+            if (!isset($body[$field]) || empty($body[$field])) {
+                $errors[] = "$field required";
             }
         }
-        return [];
+        return $errors;
     }
 
     private function assertUser(?string $id): User

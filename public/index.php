@@ -18,13 +18,9 @@ $container->delegate($slimDefaultContainer);
 
 $app = new Slim\App($container);
 
-/** @var UserController */
-$userController = $container->get(UserController::class);
+/** @var callable */
+$configureRoutes = require dirname(__DIR__) . '/config/routes.php';
 
-$app->get('/users/{id}', [$userController, 'getOne']);
-$app->put('/users/{id}', [$userController, 'update']);
-$app->delete('/users/{id}', [$userController, 'delete']);
-$app->get('/users', [$userController, 'getAll']);
-$app->post('/users', [$userController, 'create']);
+$configureRoutes($app, $container);
 
 $app->run();

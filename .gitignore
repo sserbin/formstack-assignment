@@ -1,6 +1,6 @@
 /vendor/
 /.vagrant/
-/public/avatar/
+/public/avatar
 .env
 
 # Created by https://www.gitignore.io/api/vim

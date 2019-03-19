@@ -15,6 +15,7 @@ use Slim\Http\Headers;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\Stream;
+use Slim\Http\UploadedFile;
 use Slim\Http\Uri;
 
 /**
@@ -159,6 +160,33 @@ class UserControllerTest extends TestCase
         $this->assertEquals('doe-updated', $responseJson['lastName']);
     }
 
+    /** @test */
+    public function canChangeAvatar(): void
+    {
+        // create a new user
+        $payload = [
+            'firstName' => 'john',
+            'lastName' => 'doe',
+            'email' => $email = bin2hex(random_bytes(10)) . '@example.com',
+            'password' => 'pass',
+        ];
+
+        $response = $this->process($this->request('POST', '/users', $payload));
+
+        $uri = $response->getHeader('Location')[0];
+
+        // upload avatar
+        $request = $this->request('POST', $uri . '/avatar', []);
+
+        $tmpfile = tempnam(sys_get_temp_dir(), 'fixture-avatar');
+        file_put_contents($tmpfile, file_get_contents(__DIR__.'/fixtures/test.png'));
+        $request = $request->withUploadedFiles(['avatar' => new UploadedFile($tmpfile, 'test.png')]);
+        $response = $this->process($request);
+        $responseJson = $this->parseResponse($response);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotNull($responseJson['avatar']);
+    }
 
     private function process(ServerRequestInterface $request): ResponseInterface
     {
@@ -181,6 +209,17 @@ class UserControllerTest extends TestCase
         }
         $contents = $responseBody->getContents();
         /** @var array */
-        return json_decode($contents, true);
+        $decoded = json_decode($contents, true);
+
+        // could have used JSON_THROW_ON_ERROR if were requiring 7.3+ only
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException(sprintf(
+                'failed json de-coding api response, error:%s, response:%s',
+                json_last_error_msg(),
+                var_export($contents, true)
+            ));
+        }
+
+        return $decoded;
     }
 }

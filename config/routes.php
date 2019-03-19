@@ -10,6 +10,7 @@ return function (App $app, ContainerInterface $container): void {
 
     $app->get('/users/{id}', [$userController, 'getOne']);
     $app->put('/users/{id}', [$userController, 'update']);
+    $app->post('/users/{id}/avatar', [$userController, 'changeAvatar']);
     $app->delete('/users/{id}', [$userController, 'delete']);
     $app->get('/users', [$userController, 'getAll']);
     $app->post('/users', [$userController, 'create']);

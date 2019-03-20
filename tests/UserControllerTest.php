@@ -57,6 +57,21 @@ class UserControllerTest extends TestCase
     }
 
     /** @test */
+    public function creatingWithInvalidEmailRejected(): void
+    {
+        $payload = [
+            'firstName' => 'john',
+            'lastName' => 'doe',
+            'email' => 'invalid-email-here',
+            'password' => 'pass',
+        ];
+
+        $response = $this->process($this->request('POST', '/users', $payload));
+
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    /** @test */
     public function creatingWithDuplicateEmailRejected(): void
     {
         // creating first user
@@ -114,6 +129,44 @@ class UserControllerTest extends TestCase
     }
 
     /** @test */
+    public function retrievingUnknownUserFails(): void
+    {
+        $response = $this->process($this->request('GET', '/users/1539f60c-4afb-11e9-8646-d663bd873d93', []));
+
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function canRetrieveAll(): void
+    {
+        // create a new user
+        $payload = [
+            'firstName' => 'john',
+            'lastName' => 'doe',
+            'email' => $email = bin2hex(random_bytes(10)) . '@example.com',
+            'password' => 'pass',
+        ];
+
+        $this->process($this->request('POST', '/users', $payload));
+
+        // attempt to retrieve all
+        $response = $this->process($this->request('GET', '/users', []));
+        /** @var array<array> */
+        $users = $this->parseResponse($response);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertIsArray($users);
+        // assert our fresh user is within response
+        $found = false;
+        foreach ($users as $user) {
+            if ($user['email'] === $email) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found, 'newly added user wasn\'t found in get-all response');
+    }
+
+    /** @test */
     public function canDelete(): void
     {
         // create a new user
@@ -158,6 +211,62 @@ class UserControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('john-updated', $responseJson['firstName']);
         $this->assertEquals('doe-updated', $responseJson['lastName']);
+    }
+
+    /** @test */
+    public function updatingWithInvalidEmailFails(): void
+    {
+        // create a new user
+        $payload = [
+            'firstName' => 'john',
+            'lastName' => 'doe',
+            'email' => $email = bin2hex(random_bytes(10)) . '@example.com',
+            'password' => 'pass',
+        ];
+
+        $response = $this->process($this->request('POST', '/users', $payload));
+
+        $uri = $response->getHeader('Location')[0];
+
+        // attempt to update it
+        $payload['email'] = 'invalid-email-here';
+        $response = $this->process($this->request('PUT', $uri, $payload));
+
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function updatingWithEmptyDataFails(): void
+    {
+        // create a new user
+        $payload = [
+            'firstName' => 'john',
+            'lastName' => 'doe',
+            'email' => $email = bin2hex(random_bytes(10)) . '@example.com',
+            'password' => 'pass',
+        ];
+
+        $response = $this->process($this->request('POST', '/users', $payload));
+
+        $uri = $response->getHeader('Location')[0];
+
+        $response = $this->process($this->request('PUT', $uri, []));
+
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function updatingUnknownUserFails(): void
+    {
+        $response = $this->process($this->request('PUT', '/users/1539f60c-4afb-11e9-8646-d663bd873d93', []));
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function deletingUnknownUserFails(): void
+    {
+        $response = $this->process($this->request('DELETE', '/users/1539f60c-4afb-11e9-8646-d663bd873d93', []));
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     /** @test */

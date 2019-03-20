@@ -6,7 +6,7 @@ use App\Controller\Transformer\UserTransformer;
 use App\Domain\User;
 use App\Service\Exception\UniqueConstraintViolation;
 use App\Service\UserMapperInterface;
-use Doctrine\Instantiator\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\Response;
